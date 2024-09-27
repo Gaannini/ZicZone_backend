@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "personalUser")
-
 public class User {
 
     @Id
@@ -44,4 +43,7 @@ public class User {
     @JsonIgnore
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private PersonalUser personalUser;      // 개인 회원 테이블
+
+    @Column
+    private String refreshToken; // refreshToken
 }

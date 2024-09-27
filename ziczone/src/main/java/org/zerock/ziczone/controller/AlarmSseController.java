@@ -9,8 +9,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.zerock.ziczone.domain.alarm.Alarm;
 import org.zerock.ziczone.dto.Alarm.RequestAlarmDTO;
 import org.zerock.ziczone.dto.Alarm.ResponseAlarmDTO;
+import org.zerock.ziczone.security.JwtService;
 import org.zerock.ziczone.service.alarm.AlarmService;
-import org.zerock.ziczone.service.login.JwtService;
 
 import java.io.IOException;
 import java.util.List;
