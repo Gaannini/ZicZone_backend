@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.token.TokenService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.zerock.ziczone.dto.token.RefreshTokenRequestDTO;
 import org.zerock.ziczone.security.JwtService;
 
@@ -21,16 +18,16 @@ public class TokenController {
     private final JwtService jwtService;
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
-        log.info("Refresh token request received: {}", refreshTokenRequestDTO);
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO,
+                                          @CookieValue(value = "refresh_token", required = false) String refreshToken) {
 
-        if (refreshTokenRequestDTO.getAccessToken() == null || refreshTokenRequestDTO.getRefreshToken() == null) {
+        if (refreshTokenRequestDTO.getAccessToken() == null || refreshToken == null) {
             log.warn("Access token or refresh token is missing");
             return ResponseEntity.badRequest().body(Map.of("message", "Access token and refresh token are required"));
         }
 
         try {
-            String newAccessToken = jwtService.refreshAccessToken(refreshTokenRequestDTO.getAccessToken(), refreshTokenRequestDTO.getRefreshToken());
+            String newAccessToken = jwtService.refreshAccessToken(refreshTokenRequestDTO.getAccessToken(), refreshToken);
             log.info("New access token generated successfully");
             return ResponseEntity.ok(Map.of("access_token", newAccessToken));
         } catch (IllegalArgumentException e) {
