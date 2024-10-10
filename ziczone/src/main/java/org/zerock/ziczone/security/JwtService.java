@@ -33,8 +33,8 @@ public class JwtService {
     private final UserRepository userRepository;
 
     // 토큰의 유효기간
-    static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; // 14일
-//    static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 30; // 14일
+    static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; // 7일
+//    static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 30; // 30초
     static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30; // 30분
 //    static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 15; // 임시(15초)
     static final String PREFIX = "Bearer "; // 토큰을 빨리 찾기 위해 붙여주는 문자열

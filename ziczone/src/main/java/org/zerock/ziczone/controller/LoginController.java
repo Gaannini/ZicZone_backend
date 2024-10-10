@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -49,11 +50,26 @@ public class LoginController {
                                                                         //현재 요청의 인증 상태를 저장하고 이후 요청에서도 인증정보 사용가능
 
             // 토큰 발급
-            Map<String, String> jwts = jwtService.getToken(auth.getName());
-            log.info("Token : " + jwts);
-            return ResponseEntity.ok(jwts);
+            Map<String, String> jwtMap = jwtService.getToken(auth.getName());
+            String accessToken = jwtMap.get("access_token");
+            String refreshToken = jwtMap.get("refresh_token");
+
+            // HttpOnly 쿠키로 refresh token 설정
+            ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                    .httpOnly(true) // 자바스크립트에서 접근 불가
+                    .secure(true) // HTTPS 환경에서는 true로 설정
+                    .path("/") // 쿠키 유효 경로 설정
+                    .sameSite("None") // 크로스 사이트 허용 설정
+                    .maxAge(7 * 24 * 60 * 60) // 쿠키 유효기간 (7일)
+                    .build();
+
+            log.info("Token : {}", jwtMap);
+            // access token은 body에 포함하고, refresh token은 쿠키로 전송
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString()) // refresh token을 쿠키로 전송
+                    .body(Map.of("access_token", accessToken)); // access token만 body로 반환
         } catch (BadCredentialsException e) {
-            // 아이디나 비밀번호가 틀렸을 때
+            // 인증 실패 시 처리
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Auth Fail", "error", "Invalid email or password"));
         }
